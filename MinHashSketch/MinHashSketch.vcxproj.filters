@@ -33,6 +33,9 @@
     <ClInclude Include="estimator.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="loglog_counting.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sketch_utils.cpp">

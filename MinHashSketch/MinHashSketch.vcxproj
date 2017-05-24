@@ -115,6 +115,7 @@
     <ClInclude Include="estimator.h" />
     <ClInclude Include="linear_counting.h" />
     <ClInclude Include="head.h" />
+    <ClInclude Include="loglog_counting.h" />
     <ClInclude Include="sketch.hpp" />
     <ClInclude Include="sketch_utils.h" />
   </ItemGroup>
