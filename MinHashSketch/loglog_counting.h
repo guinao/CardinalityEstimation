@@ -24,14 +24,14 @@ class LLC : public Estimator {
 private:
 	hash<int> function;
 	vector<int> first1bit;
-	double alpha;
+	double alpham;
 	int m;
 
 public:
 	LLC(int _m) {
 		m = _m;
 		double pi = acos(-1);
-		alpha = 0.79402 - (2 * pi * pi + log(4)) / 24 / m;
+		alpham = 0.79402*m - (2 * pi * pi + log(4)) / 24;
 //		cout << alpha << endl;
 		first1bit = vector<int>(m, 0);
 	}
@@ -41,7 +41,7 @@ public:
 		for (int num : first1bit) {
 			z += num;
 		}
-		return alpha * m * pow(2.0, z / m);
+		return alpham * pow(2.0, z / m);
 	}
 
 	void add(int ele) {
