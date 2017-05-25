@@ -32,7 +32,7 @@ public:
 		m = _m;
 		double pi = acos(-1);
 		alpha = 0.79402 - (2 * pi * pi + log(4)) / 24 / m;
-		cout << alpha << endl;
+//		cout << alpha << endl;
 		first1bit = vector<int>(m, 0);
 	}
 
@@ -58,14 +58,16 @@ class HyperLLC : public Estimator {
 private:
 	hash<int> function;
 	vector<int> first1bit;
-	double alpha;
+	double alphamm;
+	double pow2_32;	// a magic number 2^32/30 in origin paper
+	int num_of_zeros;
 	int m;
 
 public:
 	HyperLLC(int _m) {
 		m = _m;
 		int log2m = num_of_trail_zeros(m);
-
+		pow2_32 = pow(2.0, 32);
 		/*
 		* Description of the following magical numbers:
 		*
@@ -101,34 +103,50 @@ public:
 		**/
 
 		if (4 == log2m) {
-			alpha = 0.673 * m * m;
+			alphamm = 0.673 * m * m;
 		}
 		else if (5 == log2m) {
-			alpha = 0.697 * m * m;
+			alphamm = 0.697 * m * m;
 		}
 		else if (6 == log2m) {
-			alpha = 0.709 * m * m;
+			alphamm = 0.709 * m * m;
 		}
 		else {
-			alpha = (0.7213 / (1 + 1.079 / m))*m*m;
+			alphamm = (0.7213 / (1 + 1.079 / m)) * m * m;
 		}
 
 		first1bit = vector<int>(m, 0);
+		num_of_zeros = m;
 	}
 
 	double cardinality() {
 		double z = 0.0;
 		for (int num : first1bit) {
-			z += pow(2.0, -1*num);
+			z += pow(2.0, -1.0*num);
 		}
-		return alpha * m * m / z;
+		double estimator = alphamm / z;
+		if (estimator <= 2.5*m) {
+			if (num_of_trail_zeros == 0)
+				return estimator;
+			else
+				return m*1.0*log(m*1. / num_of_zeros);
+		}
+		else if (estimator <= pow2_32/30) {
+			return estimator;
+		}
+		else {
+			return -pow2_32 * log(1 - estimator / pow2_32);
+		}
 	}
 
 	void add(int ele) {
 		size_t h = function(ele);
 		int bucket = h % m;
 		int num = h / m;
-		first1bit[bucket] = max((int)num_of_trail_zeros(num), first1bit[bucket]);
+		if (first1bit[bucket] == 0)
+			--num_of_zeros;
+
+		first1bit[bucket] = max((int)num_of_trail_zeros(num)+1, first1bit[bucket]);
 	}
 
 	~HyperLLC() {}
