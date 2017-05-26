@@ -122,14 +122,14 @@ public:
 	double cardinality() {
 		double z = 0.0;
 		for (int num : first1bit) {
-			z += pow(2.0, -1.0*num);
+			z += pow(2.0, (double)num);
 		}
 		double estimator = alphamm / z;
 		if (estimator <= 2.5*m) {
 			if (num_of_trail_zeros == 0)
 				return estimator;
 			else
-				return m*1.0*log(m*1. / num_of_zeros);
+				return m*1.0*log((double)m / num_of_zeros);
 		}
 		else if (estimator <= pow2_32/30) {
 			return estimator;
@@ -150,4 +150,49 @@ public:
 	}
 
 	~HyperLLC() {}
+};
+
+class AdaptiveCounting : public Estimator {
+private:
+	hash<int> function;
+	vector<int> first1bit;
+	double alpham;
+	int num_of_zeros;
+	int m;
+
+public:
+	AdaptiveCounting(int _m) {
+		m = _m;
+		double pi = acos(-1);
+		alpham = 0.79402*m - (2 * pi * pi + log(4)) / 24;
+		//		cout << alpha << endl;
+		first1bit = vector<int>(m, 0);
+		num_of_zeros = m;
+	}
+
+	double cardinality() {
+		double beta = (double)num_of_zeros / m;
+		printf_s("beta = %lf\n", beta);
+		if (beta > 0.051) {
+			return -1 * m * log(beta);
+		}
+
+		double z = 0.0;
+		for (int num : first1bit) {
+			z += num;
+		}
+		return alpham * pow(2.0, z / m);
+	}
+
+	void add(int ele) {
+		size_t h = function(ele);
+		int bucket = h % m;
+		int num = h / m;
+		if (first1bit[bucket] == 0)
+			--num_of_zeros;
+
+		first1bit[bucket] = max((int)num_of_trail_zeros(num), first1bit[bucket]);
+	}
+
+	~AdaptiveCounting() {}
 };

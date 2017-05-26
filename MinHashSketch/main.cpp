@@ -19,7 +19,7 @@ void test_lc(int n)
 
 void test_llc(int n)
 {
-	LLC llc(1 << 13);
+	LLC llc(64);
 	for (int i = 0; i < n; ++i) {
 		llc.add(rand() % n);
 		llc.add(i);
@@ -29,12 +29,22 @@ void test_llc(int n)
 
 void test_hyperllc(int n)
 {
-	HyperLLC hllc(1<<13);
+	HyperLLC hllc(1 << 13);
 	for (int i = 0; i < n; ++i) {
 		hllc.add(rand() % n);
 		hllc.add(i);
 	}
 	printf_s("Cardinality using Hyper Loglog Counting: %lf\n", hllc.cardinality());
+}
+
+void test_adc(int n)
+{
+	AdaptiveCounting adc(64);
+	for (int i = 0; i < n; ++i) {
+		adc.add(rand() % n);
+		adc.add(i);
+	}
+	printf_s("Cardinality using Adaptive Counting: %lf\n", adc.cardinality());
 }
 
 void test_bottomk(int n)
@@ -57,6 +67,7 @@ int main()
 		test_lc(n);
 		test_llc(n);
 		test_hyperllc(n);
+		test_adc(n);
 	}
 	return 0;
 }

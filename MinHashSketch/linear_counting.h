@@ -40,7 +40,7 @@ public:
 	}
 
 	double cardinality() {
-		double ret = -(double)m * log(zeros * 1. / m);
+		double ret = -(double)m * log((double)zeros / m);
 		return ret;
 	}
 
