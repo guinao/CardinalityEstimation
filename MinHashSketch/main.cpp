@@ -1,4 +1,5 @@
 #include "head.h"
+#include "estimator.h"
 #include "bottomk.h"
 #include "linear_counting.h"
 #include "loglog_counting.h"
@@ -9,53 +10,58 @@ using namespace std;
 
 void test_lc(int n)
 {
-	LinearCounting lc(n);
+	auto sketch = make_unique<LinearCounting>(n);
 	for (int i = 0; i < n; ++i) {
-		lc.add(rand() % n);
-		lc.add(i);
+		sketch->add(rand() % n);
+		sketch->add(i);
 	}
-	printf_s("Cardinality using Linear Counting: %lf\n", lc.cardinality());
+	double estimation = sketch->cardinality();
+	printf_s("Cardinality using Linear Counting: %lf, relative error: %lf\n", estimation, estimation / n - 1);
 }
 
 void test_llc(int n)
 {
-	LLC llc(64);
+	auto sketch = make_unique<LLC>(64);
 	for (int i = 0; i < n; ++i) {
-		llc.add(rand() % n);
-		llc.add(i);
+		sketch->add(rand() % n);
+		sketch->add(i);
 	}
-	printf_s("Cardinality using Loglog Counting: %lf\n", llc.cardinality());
+	double estimation = sketch->cardinality();
+	printf_s("Cardinality using LogLog Counting: %lf, relative error: %lf\n", estimation, estimation / n - 1);
 }
 
 void test_hyperllc(int n)
 {
-	HyperLLC hllc(1 << 13);
+	auto sketch = make_unique<HyperLLC>(1<<13);
 	for (int i = 0; i < n; ++i) {
-		hllc.add(rand() % n);
-		hllc.add(i);
+		sketch->add(rand() % n);
+		sketch->add(i);
 	}
-	printf_s("Cardinality using Hyper Loglog Counting: %lf\n", hllc.cardinality());
+	double estimation = sketch->cardinality();
+	printf_s("Cardinality using Hyper LogLog Counting: %lf, relative error: %lf\n", estimation, estimation / n - 1);
 }
 
 void test_adc(int n)
 {
-	AdaptiveCounting adc(64);
+	auto sketch = make_unique<AdaptiveCounting>(64);
 	for (int i = 0; i < n; ++i) {
-		adc.add(rand() % n);
-		adc.add(i);
+		sketch->add(rand() % n);
+		sketch->add(i);
 	}
-	printf_s("Cardinality using Adaptive Counting: %lf\n", adc.cardinality());
+	double estimation = sketch->cardinality();
+	printf_s("Cardinality using Adaptive Counting: %lf, relative error: %lf\n", estimation, estimation / n - 1);
 }
 
 void test_bottomk(int n)
 {
-	int k = sqrt(n*1.);
-	BottomK bk(k);
+	int k = sqrt(n * 1.);
+	auto sketch = make_unique<BottomK>(k);
 	for (int i = 0; i < n; ++i) {
-		bk.add(rand() % n);
-		bk.add(i);
+		sketch->add(rand() % n);
+		sketch->add(i);
 	}
-	printf_s("Cardinality using Bottom-K: %lf\n", bk.cardinality());
+	double estimation = sketch->cardinality();
+	printf_s("Cardinality using Bottom-K: %lf, relative error: %lf\n", estimation, estimation / n - 1);
 }
 
 int main()
